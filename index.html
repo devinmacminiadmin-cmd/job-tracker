@@ -230,6 +230,56 @@
     .prep-card ul { padding-left: 20px; }
     .prep-card li { margin-bottom: 6px; }
 
+    /* ---- Lead Cards ---- */
+    .leads-section { margin-top: 52px; }
+    .leads-cat-bar { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+    .leads-cat-btn {
+      padding: 7px 16px; border-radius: 20px; border: 1.5px solid #D0D5DD;
+      background: #fff; font-size: 13px; color: #555; cursor: pointer;
+      font-weight: 500; font-family: inherit;
+    }
+    .leads-cat-btn:hover { border-color: #2E6FB8; color: #2E6FB8; }
+    .leads-cat-btn.active { background: #2E6FB8; border-color: #2E6FB8; color: #fff; }
+
+    .lead-card {
+      background: #fff; border: 1px solid #E4E7EC;
+      border-radius: 12px; margin-bottom: 12px; overflow: hidden;
+    }
+    .lead-card:hover { box-shadow: 0 2px 14px rgba(0,0,0,0.07); }
+    .lead-inner { padding: 18px 22px; display: flex; align-items: flex-start; gap: 14px; }
+    .lead-info { flex: 1; min-width: 0; }
+    .lead-co { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+    .lead-title { font-size: 15px; font-weight: 700; color: #0F1B2D; margin: 3px 0 7px; overflow-wrap: break-word; }
+    .lead-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .lead-tag {
+      font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 10px;
+    }
+    .tag-fde { background: #EDE9FE; color: #6D28D9; }
+    .tag-pm { background: #DCFCE7; color: #15803D; }
+    .tag-se { background: #FEF3C7; color: #92400E; }
+    .tag-fellows { background: #FEE2E2; color: #991B1B; }
+    .tag-remote { background: #D1FAE5; color: #065F46; }
+    .tag-hybrid { background: #E0F2FE; color: #0369A1; }
+    .tag-onsite { background: #FEF9C3; color: #713F12; }
+    .lead-pay { font-size: 14px; font-weight: 700; color: #1A7A4A; margin-bottom: 6px; }
+    .lead-location { font-size: 13px; color: #666; margin-bottom: 8px; }
+    .lead-fit { font-size: 13px; color: #444; line-height: 1.55; background: #F8F9FB; border-radius: 7px; padding: 9px 12px; margin-bottom: 12px; }
+    .lead-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .lead-apply-btn {
+      display: inline-block; padding: 7px 16px; background: #0F1B2D; color: #fff;
+      border-radius: 7px; font-size: 13px; font-weight: 600; text-decoration: none;
+    }
+    .lead-apply-btn:hover { background: #2E6FB8; }
+    .lead-status-sel {
+      padding: 6px 10px; border: 1.5px solid #D0D5DD; border-radius: 7px;
+      font-size: 12px; font-family: inherit; color: #555; background: #fff; cursor: pointer;
+    }
+    .lead-status-sel:focus { outline: none; border-color: #2E6FB8; }
+    .ls-new { border-color: #D0D5DD; color: #555; }
+    .ls-saved { border-color: #2E6FB8; color: #2E6FB8; }
+    .ls-applied { border-color: #2E7D32; color: #2E7D32; }
+    .ls-skip { border-color: #BBB; color: #999; }
+
     @media (max-width: 680px) {
       .nav { padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
       .nav-stats { gap: 12px; }
@@ -282,6 +332,18 @@
     </div>
 
     <div id="jobs-list"></div>
+
+    <div class="leads-section">
+      <div class="section-hd">Job Leads — Not Yet Applied</div>
+      <div class="leads-cat-bar">
+        <button class="leads-cat-btn active" onclick="setLeadCat('all',this)">All (12)</button>
+        <button class="leads-cat-btn" onclick="setLeadCat('fde',this)">Applied AI / FDE</button>
+        <button class="leads-cat-btn" onclick="setLeadCat('pm',this)">Product Management</button>
+        <button class="leads-cat-btn" onclick="setLeadCat('se',this)">Solutions Engineering</button>
+        <button class="leads-cat-btn" onclick="setLeadCat('fellows',this)">Research / Fellows</button>
+      </div>
+      <div id="leads-list"></div>
+    </div>
 
     <div class="section-hd">General Interview Prep</div>
 
@@ -528,6 +590,70 @@ const JOBS = [
   }
 ];
 
+// --- Lead Data ---
+const LEADS = [
+  { id:'anthropic-fde-applied-ai', cat:'fde', company:'Anthropic', color:'#D4521A',
+    title:'Forward Deployed Engineer, Applied AI',
+    pay:'~$350,000 – $550,000 TC', location:'San Francisco / NYC / Seattle',
+    wfh:'hybrid', link:'https://job-boards.greenhouse.io/anthropic/jobs/4985877008',
+    fit:'Live posting — same FDE motion as the Custom Agents role you applied for 8/15. This variant embeds with Applied AI customers. Founding team member opportunity.' },
+  { id:'anthropic-technical-deployment-lead', cat:'fde', company:'Anthropic', color:'#D4521A',
+    title:'Technical Deployment Lead',
+    pay:'~$250,000 – $400,000 TC (est.)', location:'San Francisco / NYC / Seattle',
+    wfh:'hybrid', link:'https://job-boards.greenhouse.io/anthropic/jobs/5017903008',
+    fit:'PM-FDE hybrid: you own scoping, SOW, stakeholder management, and value measurement on custom agent deployments. Strong match for Cadence AI Labs experience.' },
+  { id:'palantir-fde-ai', cat:'fde', company:'Palantir', color:'#1B2A4A',
+    title:'Forward Deployed AI Engineer',
+    pay:'$205,000 – $486,000 TC', location:'Multiple US cities',
+    wfh:'hybrid', link:'https://jobs.lever.co/palantir/636fc05c-d348-4a06-be51-597cb9e07488',
+    fit:'Palantir invented the FDE model. Government clearance directly relevant. High-comp, demanding culture. Your production infrastructure background is strong here.' },
+  { id:'glean-founding-fde', cat:'fde', company:'Glean', color:'#2563EB',
+    title:'Founding Forward Deployed Engineer',
+    pay:'~$170,000 – $280,000 + equity', location:'Palo Alto, CA',
+    wfh:'hybrid', link:'https://job-boards.greenhouse.io/gleanwork/jobs/4651991005',
+    fit:'The Glean AI Solutions Engineer posting that disappeared was similar to this. Founding-team FDE building next-gen product surfaces directly with enterprise C-suite.' },
+  { id:'databricks-fde', cat:'fde', company:'Databricks', color:'#FF6B35',
+    title:'AI Engineer — Forward Deployed',
+    pay:'~$175,000 – $280,000 + equity (est.)', location:'Remote (US)',
+    wfh:'remote', link:'https://www.databricks.com/company/careers/professional-services-operations/ai-engineer---fde-forward-deployed-engineer-8560393002',
+    fit:'Fully remote FDE. Strong on data pipeline and production reliability angle. Government clearance is a real differentiator for Databricks enterprise and gov clients.' },
+  { id:'glean-fde-pm', cat:'pm', company:'Glean', color:'#2563EB',
+    title:'Forward Deployed Product Manager',
+    pay:'$170,000 – $280,000 + equity', location:'Palo Alto, CA',
+    wfh:'hybrid', link:'https://job-boards.greenhouse.io/gleanwork/jobs/4659409005',
+    fit:'Same archetype as the Yahoo Sr. PM role. Founder and entrepreneurial experience explicitly valued. Work directly in customer environments defining product direction.' },
+  { id:'google-deepmind-pm', cat:'pm', company:'Google DeepMind', color:'#4285F4',
+    title:'AI Product Manager',
+    pay:'$183,000 – $320,000 base', location:'Mountain View, CA / NYC',
+    wfh:'hybrid', link:'https://www.google.com/about/careers/applications/jobs/results?q=ai+product+manager',
+    fit:'Multiple open PM roles across Gemini, Deep Research, and personalization. Google-scale impact. Highly competitive but your production AI experience is genuine.' },
+  { id:'openai-solutions-engineer-presales', cat:'se', company:'OpenAI', color:'#10A37F',
+    title:'Solutions Engineer, Pre-Sales',
+    pay:'~$200,000 – $350,000 TC (est.)', location:'San Francisco, CA',
+    wfh:'hybrid', link:'https://openai.com/careers/solutions-engineer-pre-sales-san-francisco/',
+    fit:'Pre-sales technical role. Cadence discovery conversations, architecture scoping, and proof-of-concept delivery map directly. Strong resume angle from FairSwap + consulting.' },
+  { id:'openai-solutions-architect-startups', cat:'se', company:'OpenAI', color:'#10A37F',
+    title:'Solutions Architect, Startups',
+    pay:'~$200,000 – $350,000 TC (est.)', location:'San Francisco, CA',
+    wfh:'hybrid', link:'https://openai.com/careers/solutions-architect-startups-san-francisco/',
+    fit:'Startup segment — high velocity, creative use cases, collecting high-fidelity model feedback. Your production agent stack and Cadence work are strong evidence.' },
+  { id:'openai-solutions-architect-genai', cat:'se', company:'OpenAI', color:'#10A37F',
+    title:'Solutions Architect, GenAI Deployment',
+    pay:'~$200,000 – $350,000 TC (est.)', location:'New York City, NY',
+    wfh:'hybrid', link:'https://openai.com/careers/solutions-architect-generative-ai-deployment-new-york-city/',
+    fit:'Enterprise deployment architect. Holistic architecture design across ChatGPT, API, and tooling. NYC-based. Closest to your Cadence deployment model.' },
+  { id:'anthropic-fellows-safety', cat:'fellows', company:'Anthropic', color:'#D4521A',
+    title:'Fellows Program — AI Safety & Security',
+    pay:'$3,850/week + $15,000/month compute', location:'SF / London / Remote-friendly US',
+    wfh:'remote', link:'https://job-boards.greenhouse.io/anthropic/jobs/5183044008',
+    fit:'Rolling admissions, next cohort January 2027. 25–50% of fellows get full-time offers. Your OpenClaw security/permission architecture is directly relevant.' },
+  { id:'anthropic-fellows-ml', cat:'fellows', company:'Anthropic', color:'#D4521A',
+    title:'Fellows Program — ML Systems & RL',
+    pay:'$3,850/week + $15,000/month compute', location:'SF / London / Remote-friendly US',
+    wfh:'remote', link:'https://job-boards.greenhouse.io/anthropic/jobs/5183051008',
+    fit:'Production ML systems and distributed infrastructure background applies. Stretch on research depth, but the engineering and pipeline work is a credible entry.' }
+];
+
 // --- Auth ---
 function auth() {
   const val = document.getElementById('pw').value;
@@ -735,9 +861,72 @@ function updateStatus(jobId, status) {
   badge.className = 'status-badge s-' + status;
 }
 
+// --- Leads ---
+let activeLeadCat = 'all';
+
+function getLeadStatus(id) {
+  return localStorage.getItem('jt_lead_' + id) || 'new';
+}
+
+function updateLeadStatus(id, val, el) {
+  localStorage.setItem('jt_lead_' + id, val);
+  el.className = 'lead-status-sel ls-' + val;
+}
+
+function setLeadCat(cat, btn) {
+  activeLeadCat = cat;
+  document.querySelectorAll('.leads-cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderLeads();
+}
+
+function renderLeads() {
+  const catLabels = { fde:'Applied AI / FDE', pm:'Product Management', se:'Solutions Engineering', fellows:'Research / Fellows' };
+  const wfhLabel = { remote:'Remote', hybrid:'Hybrid', onsite:'On-Site' };
+  const wfhTag = { remote:'tag-remote', hybrid:'tag-hybrid', onsite:'tag-onsite' };
+  const catTag = { fde:'tag-fde', pm:'tag-pm', se:'tag-se', fellows:'tag-fellows' };
+
+  const visible = activeLeadCat === 'all' ? LEADS : LEADS.filter(l => l.cat === activeLeadCat);
+  const el = document.getElementById('leads-list');
+
+  if (visible.length === 0) {
+    el.innerHTML = '<p style="color:#999;padding:16px 0;">No leads in this category.</p>';
+    return;
+  }
+
+  el.innerHTML = visible.map(l => {
+    const status = getLeadStatus(l.id);
+    const statusOpts = ['new','saved','applied','skip'].map(s =>
+      `<option value="${s}" ${s===status?'selected':''}>${{new:'New',saved:'Saved',applied:'Applied',skip:'Skip'}[s]}</option>`
+    ).join('');
+    return `
+    <div class="lead-card">
+      <div class="lead-inner">
+        <div class="co-badge" style="background:${l.color}">${l.company[0]}</div>
+        <div class="lead-info">
+          <div class="lead-co">${l.company}</div>
+          <div class="lead-title">${l.title}</div>
+          <div class="lead-tags">
+            <span class="lead-tag ${catTag[l.cat]}">${catLabels[l.cat]}</span>
+            <span class="lead-tag ${wfhTag[l.wfh]}">${wfhLabel[l.wfh]}</span>
+          </div>
+          <div class="lead-pay">${l.pay}</div>
+          <div class="lead-location">📍 ${l.location}</div>
+          <div class="lead-fit">${l.fit}</div>
+          <div class="lead-actions">
+            <a href="${l.link}" target="_blank" class="lead-apply-btn">View &amp; Apply</a>
+            <select class="lead-status-sel ls-${status}" onchange="updateLeadStatus('${l.id}', this.value, this)">${statusOpts}</select>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 function init() {
   renderStats();
   renderJobs();
+  renderLeads();
 }
 
 window.addEventListener('DOMContentLoaded', () => {
