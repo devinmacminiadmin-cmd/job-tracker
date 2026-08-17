@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Tracker</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, 'Helvetica Neue', Arial, sans-serif;
+      background: #F4F6FA;
+      color: #1A1A1A;
+      min-height: 100vh;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* Gate */
+    #gate {
+      position: fixed; inset: 0;
+      background: #0F1B2D;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999;
+    }
+    .gate-card {
+      background: #1A2B3C; border: 1px solid #2E4A6B;
+      border-radius: 14px; padding: 48px 44px; width: 380px; text-align: center;
+    }
+    .gate-icon { font-size: 36px; margin-bottom: 14px; }
+    .gate-card h1 { color: #fff; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+    .gate-card p { color: #7A9DBB; font-size: 13px; margin-bottom: 28px; }
+    .gate-card input {
+      width: 100%; padding: 13px 16px; background: #0F1B2D;
+      border: 1px solid #2E4A6B; border-radius: 8px;
+      color: #fff; font-size: 15px; margin-bottom: 12px; outline: none;
+      font-family: inherit;
+    }
+    .gate-card input:focus { border-color: #2E6FB8; }
+    .gate-card button {
+      width: 100%; padding: 13px; background: #2E6FB8;
+      color: #fff; border: none; border-radius: 8px;
+      font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
+    }
+    .gate-card button:hover { background: #3A82D4; }
+    #gate-err { color: #FF7070; font-size: 13px; margin-top: 12px; display: none; }
+
+    /* App */
+    #app { display: none; }
+
+    /* Nav */
+    .nav {
+      background: #0F1B2D; padding: 14px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-title { color: #fff; font-size: 17px; font-weight: 700; }
+    .nav-title span { color: #2E6FB8; }
+    .nav-stats { display: flex; gap: 28px; }
+    .nav-stat { text-align: center; }
+    .nav-stat .num { color: #fff; font-size: 22px; font-weight: 700; display: block; }
+    .nav-stat .lbl { color: #7A9DBB; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* Main */
+    .main { max-width: 1080px; margin: 0 auto; padding: 36px 40px 80px; }
+
+    /* Filter bar */
+    .filter-bar { display: flex; gap: 8px; margin-bottom: 28px; flex-wrap: wrap; }
+    .filter-btn {
+      padding: 7px 16px; border-radius: 20px; border: 1.5px solid #D0D5DD;
+      background: #fff; font-size: 13px; color: #555; cursor: pointer;
+      font-weight: 500; font-family: inherit;
+    }
+    .filter-btn:hover { border-color: #2E6FB8; color: #2E6FB8; }
+    .filter-btn.active { background: #2E6FB8; border-color: #2E6FB8; color: #fff; }
+
+    /* Job card */
+    .job-card {
+      background: #fff; border: 1px solid #E4E7EC;
+      border-radius: 12px; margin-bottom: 14px; overflow: hidden;
+    }
+    .job-card:hover { box-shadow: 0 2px 14px rgba(0,0,0,0.07); }
+    .job-header {
+      display: flex; align-items: center; padding: 20px 24px;
+      cursor: pointer; gap: 16px;
+    }
+    .co-badge {
+      width: 46px; height: 46px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 19px; font-weight: 800; color: #fff; flex-shrink: 0;
+    }
+    .job-info { flex: 1; min-width: 0; }
+    .job-co { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+    .job-title { font-size: 16px; font-weight: 700; color: #0F1B2D; margin: 2px 0; }
+    .job-sub { font-size: 13px; color: #666; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+    .job-pay { font-weight: 600; color: #1A7A4A; }
+    .referral-tag { font-size: 11px; background: #FFF3CD; color: #8A6400; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+    .job-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+    .status-badge { padding: 4px 13px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+    .s-applied { background: #EBF4FF; color: #2E6FB8; }
+    .s-screening { background: #FFF3E0; color: #C47200; }
+    .s-interview { background: #E8F5E9; color: #2E7D32; }
+    .s-offer { background: #F3E5F5; color: #7B1FA2; }
+    .s-rejected { background: #FFEBEE; color: #C62828; }
+    .s-withdrawn { background: #F5F5F5; color: #757575; }
+    .chevron { color: #BBB; font-size: 20px; transition: transform 0.2s; user-select: none; }
+    .job-card.open .chevron { transform: rotate(180deg); }
+
+    /* Card body */
+    .job-body { display: none; border-top: 1px solid #F0F0F0; }
+    .job-card.open .job-body { display: block; }
+
+    /* Tab nav */
+    .tab-nav {
+      display: flex; border-bottom: 1px solid #E5E7EB;
+      background: #FAFAFA; padding: 0 24px;
+    }
+    .tab-btn {
+      padding: 12px 14px; font-size: 13px; font-weight: 600; color: #999;
+      border: none; background: none; cursor: pointer; font-family: inherit;
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .tab-btn.active { color: #2E6FB8; border-bottom-color: #2E6FB8; }
+
+    /* Tab content */
+    .tab-content { padding: 24px; }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    /* Overview */
+    .overview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .info-block h4 {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #999; margin-bottom: 8px;
+    }
+    .info-block p, .info-block li { font-size: 14px; color: #333; line-height: 1.65; }
+    .info-block ul { padding-left: 18px; }
+    .info-block li { margin-bottom: 4px; }
+    .tag {
+      display: inline-block; background: #EBF4FF; color: #2E6FB8;
+      font-size: 12px; font-weight: 600; padding: 3px 10px;
+      border-radius: 12px; margin: 2px 3px 2px 0;
+    }
+    .note-banner {
+      background: #FFF8E1; border: 1px solid #FFD54F; border-radius: 8px;
+      padding: 10px 14px; font-size: 13px; color: #7A5500; margin-bottom: 16px;
+    }
+
+    /* Status editor */
+    .status-editor { margin-top: 20px; }
+    .status-editor label { font-size: 13px; font-weight: 600; color: #555; display: block; margin-bottom: 6px; }
+    .status-editor select {
+      padding: 8px 12px; border: 1px solid #D0D5DD; border-radius: 7px;
+      font-size: 13px; font-family: inherit; color: #333; background: #fff;
+    }
+    .status-editor select:focus { outline: none; border-color: #2E6FB8; }
+
+    /* Interview Prep */
+    .prep-block { margin-bottom: 28px; }
+    .prep-block h3 {
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #0F1B2D;
+      border-left: 4px solid #2E6FB8; padding-left: 10px;
+      margin-bottom: 14px;
+    }
+    .qa-item { border: 1px solid #E4E7EC; border-radius: 8px; margin-bottom: 9px; overflow: hidden; }
+    .qa-q {
+      padding: 13px 18px; font-size: 14px; font-weight: 600; color: #1A1A1A;
+      cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+      background: #FAFAFA; gap: 12px;
+    }
+    .qa-q:hover { background: #F0F4F8; }
+    .qa-hint { font-size: 11px; font-weight: 500; color: #2E6FB8; flex-shrink: 0; }
+    .qa-a {
+      display: none; padding: 14px 18px; font-size: 14px; color: #333;
+      border-top: 1px solid #E4E7EC; background: #fff; line-height: 1.65;
+    }
+    .qa-item.open .qa-a { display: block; }
+    .qa-item.open .qa-hint { color: #AAA; }
+
+    .tp-list { list-style: none; padding: 0; }
+    .tp-list li {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 9px 0; border-bottom: 1px solid #F3F3F3;
+      font-size: 14px; color: #333;
+    }
+    .tp-list li:last-child { border-bottom: none; }
+    .tp-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #2E6FB8; flex-shrink: 0; margin-top: 7px;
+    }
+
+    /* Notes */
+    .notes-label { font-size: 13px; font-weight: 600; color: #555; margin-bottom: 8px; display: block; }
+    .notes-ta {
+      width: 100%; min-height: 120px; border: 1px solid #D0D5DD;
+      border-radius: 8px; padding: 13px; font-size: 14px;
+      font-family: inherit; color: #333; resize: vertical; outline: none; line-height: 1.6;
+    }
+    .notes-ta:focus { border-color: #2E6FB8; }
+    .notes-actions { margin-top: 10px; display: flex; align-items: center; gap: 12px; }
+    .notes-save {
+      padding: 8px 18px; background: #2E6FB8; color: #fff;
+      border: none; border-radius: 6px; font-size: 13px;
+      font-weight: 600; cursor: pointer; font-family: inherit;
+    }
+    .notes-save:hover { background: #3A82D4; }
+    .notes-saved { color: #2E7D32; font-size: 13px; display: none; }
+
+    /* General prep section */
+    .section-hd {
+      font-size: 19px; font-weight: 700; color: #0F1B2D;
+      border-left: 4px solid #2E6FB8; padding: 4px 0 4px 14px;
+      margin: 52px 0 20px;
+    }
+    .prep-card {
+      background: #fff; border: 1px solid #E4E7EC;
+      border-radius: 12px; padding: 24px; margin-bottom: 14px;
+    }
+    .prep-card h3 { font-size: 16px; font-weight: 700; color: #0F1B2D; margin-bottom: 12px; }
+    .prep-card p, .prep-card li { font-size: 14px; color: #444; line-height: 1.65; }
+    .prep-card ul { padding-left: 20px; }
+    .prep-card li { margin-bottom: 6px; }
+
+    @media (max-width: 680px) {
+      .nav { padding: 14px 20px; }
+      .nav-stats { gap: 16px; }
+      .main { padding: 24px 18px 60px; }
+      .overview-grid { grid-template-columns: 1fr; }
+      .job-header { padding: 16px 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Password Gate -->
+<div id="gate">
+  <div class="gate-card">
+    <div class="gate-icon">📋</div>
+    <h1>Job Tracker</h1>
+    <p>Devin Anderson — 2026 Applications</p>
+    <input type="password" id="pw" placeholder="Password"
+      onkeydown="if(event.key==='Enter')auth()">
+    <button onclick="auth()">Enter</button>
+    <div id="gate-err">Incorrect password.</div>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app">
+  <nav class="nav">
+    <div class="nav-title">Job Tracker <span>2026</span></div>
+    <div class="nav-stats" id="nav-stats"></div>
+  </nav>
+
+  <div class="main">
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+      <button class="filter-btn" onclick="setFilter('applied',this)">Applied</button>
+      <button class="filter-btn" onclick="setFilter('screening',this)">Screening</button>
+      <button class="filter-btn" onclick="setFilter('interview',this)">Interview</button>
+      <button class="filter-btn" onclick="setFilter('offer',this)">Offer</button>
+      <button class="filter-btn" onclick="setFilter('rejected',this)">Rejected</button>
+    </div>
+
+    <div id="jobs-list"></div>
+
+    <div class="section-hd">General Interview Prep</div>
+
+    <div class="prep-card">
+      <h3>Your Universal Story</h3>
+      <ul>
+        <li>You spent the last year building what these companies are selling: production AI agent infrastructure. Real systems, real clients, real uptime requirements, real consequences when they fail.</li>
+        <li><strong>OpenClaw:</strong> 24/7 multi-agent platform, 3 agents across heterogeneous hardware, real clients depending on continuous availability.</li>
+        <li><strong>Cadence AI Labs:</strong> Full product lifecycle, discovery through deployment, paying clients. Responsible for reliability in environments you don't control.</li>
+        <li><strong>Relativity (6 years):</strong> Enterprise-scale production systems on Azure, government clearance, cross-team integration at scale.</li>
+        <li><strong>Independent work:</strong> LiteLLM proxy, Polygon signal validation pipeline, eval framework with baseline locking, FairSwap shipped to App Store and Google Play.</li>
+      </ul>
+    </div>
+
+    <div class="prep-card">
+      <h3>Common Technical Themes Across All Roles</h3>
+      <ul>
+        <li><strong>Agent architecture:</strong> Isolated memory states, scoped tool permissions, heartbeat monitoring, circuit breakers, approval gating for external actions.</li>
+        <li><strong>Eval frameworks:</strong> Baseline locking before shipping. 80/80 rule: 80% winner capture, 80% loser filter. Measure outcomes, iterate from data not intuition.</li>
+        <li><strong>Production reliability:</strong> Silent failure detection, alert deduplication, exec allowlists, process supervision across heterogeneous hardware.</li>
+        <li><strong>MCP and tool calling:</strong> Custom integrations for AgentMail, Slack OAuth 2.0, Tally webhooks, Polygon REST, DigitalOcean SSH, Cloudflare Workers.</li>
+        <li><strong>LLM routing and governance:</strong> Multi-tenant LiteLLM proxy, cost/capability/latency tradeoffs, routing policy design, OOM debugging on live VPS.</li>
+      </ul>
+    </div>
+
+    <div class="prep-card">
+      <h3>The "Why AI Now" Answer</h3>
+      <p>The gap between what AI can do and what's actually running in production is still wide. The companies hiring for these roles are trying to close it. I've been doing that work for the past year, building systems that have to function on Monday morning without supervision. The opportunity is to do it at scale, with better models, inside organizations that are serious about making it work safely.</p>
+    </div>
+
+    <div class="prep-card">
+      <h3>Talking Points Cheat Sheet</h3>
+      <ul>
+        <li><strong>Entrepreneurial:</strong> Founded Cadence AI Labs. Own discovery, scoping, building, GTM, and support. Every engagement is a startup sprint with no safety net.</li>
+        <li><strong>Technical depth:</strong> Not just using APIs. Designing architectures, writing code, debugging in production, responsible for uptime.</li>
+        <li><strong>Customer-facing:</strong> Cadence qualifying calls, scoping whether AI can actually solve the problem, setting success criteria before writing code.</li>
+        <li><strong>Government clearance:</strong> Active clearance from Relativity tenure. Relevant for regulated or federal-adjacent customers at any of these companies.</li>
+        <li><strong>Claude specifically:</strong> Daily user. Claude Code, Claude API, LiteLLM routing to Claude Sonnet/Haiku. Observed model judgment in production across thousands of real interactions.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+const PASSWORD = 'track2026';
+
+const JOBS = [
+  {
+    id: 'anthropic-applied-ai',
+    company: 'Anthropic',
+    color: '#D4521A',
+    title: 'Applied AI Engineer, Enterprise Tech',
+    dateApplied: '2026-08-15',
+    status: 'applied',
+    pay: '$200,000 – $320,000',
+    location: 'SF / NYC / Seattle',
+    link: 'https://job-boards.greenhouse.io/anthropic/jobs/5057647008',
+    referral: null,
+    resume: 'anthropic-applied-ai-enterprise.md',
+    note: null,
+    description: 'Technical product engineer and trusted advisor to Digital Native Businesses adopting the Claude API. Advise on LLM architecture, develop evaluation frameworks, guide customers from technical discovery through production deployment.',
+    themes: ['Customer advisory', 'Eval frameworks', 'LLM architecture', 'Cross-team collaboration', 'AI safety focus'],
+    questions: [
+      { q: 'Why Anthropic specifically?', a: "Claude's judgment in unguided situations outperforms other models I've deployed. I've run every major LLM API in production. Claude consistently closes the gap between 'it did what I said' and 'it did what I meant.' I want to do this work at the team that takes production AI safety most seriously, as actual design constraints rather than marketing copy." },
+      { q: 'Walk me through advising a customer through a complex technical implementation.', a: "At Cadence, every engagement starts with discovery: can AI actually solve this problem? If yes, I scope the MVP with explicit success criteria before writing code. For one deployment I had to design around the client's data handling requirements and access controls. The technical architecture was 40% of the work. The rest was understanding the organizational environment well enough to build something that holds up when I'm not there." },
+      { q: 'How do you design an eval framework for an LLM system?', a: "Lock a baseline before shipping anything. My signal validation pipeline runs against an 80/80 rule: 80% winner capture, 80% loser filter. Every change is tested against that baseline before going live. For LLM systems: define failure modes first, build filters that reject them, then measure outcomes and iterate from data rather than intuition." },
+      { q: 'Describe your experience with production agent systems.', a: "24/7 multi-agent platform: primary orchestrator on a Mac Mini, ops agent on a Raspberry Pi 5, revenue agent. Each has isolated memory state, scoped tool permissions, cron-driven autonomous workflows, and heartbeat monitoring. Circuit breakers, alert deduplication, and exec allowlists catch silent failures before they compound. Real clients depending on continuous uptime. That architecture is now what I deploy for Cadence clients." },
+      { q: 'How do you handle ambiguity when a customer doesn\'t know what they want?', a: "Discovery first: ask what problem they're trying to solve, not what tool they want. At Cadence, most early calls are qualification: can AI actually solve this? If yes, scope the MVP with clear success criteria before writing code. The gap between a working prototype and something that holds up in production is almost always organizational, not technical." }
+    ],
+    talkingPoints: [
+      'OpenClaw: 24/7 multi-agent platform, 3 agents, real clients, real uptime requirements',
+      'Cadence: full deployment lifecycle, paying clients, responsible for reliability in environments I don\'t control',
+      'LiteLLM proxy: multi-tenant model routing and governance at scale',
+      'Eval framework: baseline locking, 80/80 rule, measured iteration from outcomes',
+      'Active government clearance from Relativity tenure'
+    ]
+  },
+  {
+    id: 'anthropic-fde',
+    company: 'Anthropic',
+    color: '#D4521A',
+    title: 'Forward Deployed Engineer, Custom Agents',
+    dateApplied: '2026-08-15',
+    status: 'applied',
+    pay: 'Not disclosed',
+    location: 'Not specified',
+    link: 'https://job-boards.greenhouse.io/anthropic/jobs/5074695008',
+    referral: null,
+    resume: 'anthropic-fde-custom-agents.md',
+    note: 'JD taken down 2026-08-16. Posting no longer live. Key themes: MCP servers, sub-agents, enterprise deployment, custom agent builds.',
+    description: 'Embed directly with strategic enterprise customers to build production artifacts: MCP servers, sub-agents, and agent skills. More hands-on builder than the Applied AI Engineer role. White-glove deployment support.',
+    themes: ['MCP servers', 'Sub-agents', 'Agent skills', 'Enterprise deployment', 'Production reliability'],
+    questions: [
+      { q: 'What\'s the difference between this role and a standard SE or consultant?', a: "The FDE role means going deep into the customer's actual environment and building something that fits their needs, not handing off a reference architecture. When I deployed an agent on a client's VPS, I had to design around their access controls and data handling requirements. The technical work was 40% of it. The rest was understanding the environment well enough to build something that functions without me there." },
+      { q: 'Describe an MCP server or tool integration you built.', a: "Built custom tool integrations for AgentMail (email send/receive/thread tracking), Slack OAuth 2.0 multi-tenant app installation, Tally webhook processing, Polygon REST API for real-time financial data, DigitalOcean SSH provisioning, and Cloudflare Workers deployment. Each tool designed so the agent can invoke it safely with defined inputs and predictable outputs." },
+      { q: 'How do you scope a custom agent deployment?', a: "Start with what the agent is allowed to do, not what it can do. Define the persona, scope the tool permissions, define memory boundaries, write the onboarding docs, and hand off something the client can operate and extend. At Cadence: $4,500 to $12,000 per deployment. Success means it holds up on Monday morning without me." },
+      { q: 'What makes an autonomous agent safe to deploy in a customer environment?', a: "Defined scope: explicit tool allowlists, no unbounded external actions. Memory isolation: agent doesn't leak context across tenants or sessions. Approval gating: any action touching external state goes through a human-readable confirmation step. Circuit breakers: the agent stops and alerts when error thresholds hit, rather than compounding silently. These are live in my production platform right now." }
+    ],
+    talkingPoints: [
+      'Built and deployed MCP-style tool integrations across 6+ external systems',
+      'Cadence deployment model: scope, build, deploy on client infra, responsible for reliability',
+      'Multi-agent platform: isolated memory, scoped permissions, approval gating',
+      'Government clearance relevant for regulated or federal-adjacent customers'
+    ]
+  },
+  {
+    id: 'cohere-fde',
+    company: 'Cohere',
+    color: '#3D6BE5',
+    title: 'Forward Deployed Engineer, Agentic Platform',
+    dateApplied: '2026-08-15',
+    status: 'applied',
+    pay: 'Not disclosed',
+    location: 'West Coast',
+    link: 'https://jobs.ashbyhq.com/cohere/1fa01a03-9253-4f62-8f10-0fe368b38cb9',
+    referral: null,
+    resume: 'cohere-fde-agentic.md',
+    note: 'JD was JavaScript-rendered; full text not recoverable. Key theme: prototype to production agentic workflows for enterprise, delivering concrete business value.',
+    description: 'Design, build, and deploy agentic workflows powered by LLMs from early prototype through production-grade AI agent. Deliver concrete business value for strategic enterprise accounts.',
+    themes: ['Agentic workflows', 'Prototype to production', 'LLM deployment', 'Enterprise delivery', 'Business value focus'],
+    questions: [
+      { q: 'How do you move from prototype to production on an agentic system?', a: "The prototype tells you what's possible. Production requires: memory isolation so the agent doesn't leak state, tool permission scoping so it can only do what it's supposed to, monitoring so you know when it fails silently, and approval gates for anything touching external systems. My Cadence deployments go from scoping to production handoff in 2 to 4 weeks. That's prototype-to-production in practice." },
+      { q: 'What does delivering concrete business value from an AI agent look like?', a: "Define success criteria before writing code. At Cadence: what does this agent replace? What does the client measure? Then build to those outcomes, not to the technology. For one client, the value was eliminating hours of daily manual intake processing. We scoped it, built it, measured time savings after two weeks, and iterated from that data." },
+      { q: 'Walk me through your approach to customer discovery for an AI deployment.', a: "Qualifying question first: not 'what AI tool do you want' but 'what workflow is eating your team's time.' If there's a repeatable, rule-based, high-volume process, AI can probably help. Then scope the MVP: what's the minimum version that demonstrates value in 2 to 3 weeks? Don't build a full platform when a targeted automation proves the concept." }
+    ],
+    talkingPoints: [
+      'Cadence: prototype to production for paying clients, not demos',
+      'Multi-agent platform: real uptime, real clients, real stakes',
+      'Strong Python, API integration, agent orchestration',
+      'Full lifecycle ownership: scoping through post-deployment reliability'
+    ]
+  },
+  {
+    id: 'openai-agent-enablement',
+    company: 'OpenAI',
+    color: '#10A37F',
+    title: 'Applied AI Engineer, Agent Enablement',
+    dateApplied: '2026-08-16',
+    status: 'applied',
+    pay: 'Not disclosed',
+    location: 'San Francisco (3 days/week)',
+    link: 'https://openai.com/careers/applied-ai-engineer-agent-enablement-san-francisco/',
+    referral: null,
+    resume: 'openai-applied-ai-agent-enablement.md',
+    note: null,
+    description: 'Help strategic partners design, build, validate, and operate agent enablement integrations across web apps, connectors, APIs, CLIs, and MCP servers. Strong focus on identity systems, OAuth, and agentic account linking.',
+    themes: ['OAuth / identity systems', 'MCP servers', 'Partner integrations', 'Developer tools', 'Production reliability'],
+    questions: [
+      { q: 'Explain how OAuth 2.0 works in the context of an agent integration.', a: "Authorization Code Flow with PKCE for browser-based agents. The user authorizes, gets a code, the agent exchanges it for an access token. For agentic account linking: the agent needs persistent tokens, so refresh token storage and rotation matters. Key risks: scope creep (request only what the agent actually needs), token leakage, and consent clarity so the user understands what they're authorizing the agent to do on their behalf." },
+      { q: 'How would you scope a partner integration from a technical discovery call?', a: "Start with: what does the partner's system expose? APIs, webhooks, CLIs. Then: what does the agent need to do on behalf of the user? Map those to the minimum necessary OAuth scopes. Then: what are the failure cases and how should the agent behave when the integration is down or rate-limited? Scope the reference implementation around those edge cases, not just the happy path." },
+      { q: 'What does good MCP server design look like?', a: "Tools with defined inputs, predictable outputs, and explicit error states. No unbounded actions. Every tool should have a clear scope of what it can and cannot touch. The MCP server should handle auth transparently so the agent doesn't manage credentials directly. Good documentation so the agent, and the human reviewing logs, can understand what each tool does." }
+    ],
+    talkingPoints: [
+      'Built OAuth 2.0 Slack app with multi-tenant installation flow',
+      'Integrated 6+ external APIs as agent tools: AgentMail, Tally, Polygon, DigitalOcean, Cloudflare',
+      'Production API debugging: auth errors, rate limits, retry logic',
+      'FairSwap: shipped full-stack app with production backend and Stripe billing'
+    ]
+  },
+  {
+    id: 'scaleai-fde',
+    company: 'Scale AI',
+    color: '#4A47D5',
+    title: 'Forward Deployed Engineer, GenAI',
+    dateApplied: '2026-08-16',
+    status: 'applied',
+    pay: '$179,400 – $224,250',
+    location: 'SF or NYC (hybrid)',
+    link: 'https://scale.com/careers/4593571005',
+    referral: null,
+    resume: 'scaleai-fde-genai.md',
+    note: null,
+    description: 'Build customer and operator-specific infrastructure for high-quality AI data with low turnaround time. Work with leading AI companies and government agencies on complex AI data problems. Full-stack ownership from design through deployment.',
+    themes: ['Data infrastructure', 'Customer collaboration', 'AI data pipelines', 'Full-stack ownership', 'Government clients'],
+    questions: [
+      { q: 'How do you design a data pipeline for correctness under adversarial inputs?', a: "Define the failure modes first: what are the ways bad data gets in? My Polygon pipeline handles out-of-sequence bars, API blips, timezone mismatches, and stale entries. For each: hard rejection with an explicit error, not silent pass-through. Then lock a baseline and test every change against it. The goal is that bad data never reaches the downstream decision system." },
+      { q: 'Walk me through a time you shipped something quickly for a customer.', a: "Cadence AI Labs client deployments: 2 to 4 weeks from qualifying call to production agent on their infrastructure. The constraint forces good scoping. You can't build everything, so you build what proves the value. That's the discipline Scale needs on FDE engagements: rapid iteration with real customers, not endless planning." },
+      { q: 'How do you work with government or enterprise customers with strict requirements?', a: "Relativity: 6 years managing production infrastructure for legal data systems under government clearance. Strict compliance requirements, uptime obligations, and audit trails. The key is designing the system to meet those constraints from the start, not retrofitting them. Active government clearance from that tenure." }
+    ],
+    talkingPoints: [
+      'Polygon pipeline: production financial data with adversarial-input hardening and baseline locking',
+      'Cadence: customer-facing discovery, scoping, rapid deployment',
+      'Relativity: government clearance, compliance-aware infrastructure, enterprise scale',
+      'LiteLLM proxy: real OOM debugging on live infrastructure (added 2GB swap to 1GB VPS)'
+    ]
+  },
+  {
+    id: 'yahoo-paranoids',
+    company: 'Yahoo',
+    color: '#6B21A8',
+    title: 'Paranoids Cyber Experience Engineer',
+    dateApplied: '2026-08-17',
+    status: 'applied',
+    pay: 'Not disclosed',
+    location: 'United States',
+    link: 'https://ouryahoo.wd5.myworkdayjobs.com/careers/job/United-States-of-America/Paranoids-Cyber-Experience-Engineer_JR0026959',
+    referral: 'Friend on the Paranoids team',
+    resume: 'yahoo-paranoids-cyber-experience-engineer.md',
+    note: null,
+    description: 'Build AI-native internal tools for Yahoo\'s Paranoids security team. Own the skills/plugin infrastructure and advocate for developer experience across teams. Ship agent capabilities for security engineers whose primary job is not AI.',
+    themes: ['Internal AI tooling', 'Skills / plugin infrastructure', 'Developer experience', 'MCP / API integration', 'Claude Code, GitHub'],
+    questions: [
+      { q: 'You don\'t have a deep security background. Why are you right for this role?', a: "The role isn't security research — it's building AI-native internal tools for people who have another job to do. That's exactly what I built with OpenClaw: a platform where non-AI engineers can use and extend agent capabilities without understanding the underlying infrastructure. The security context is where those tools live, not what the role requires me to be." },
+      { q: 'Describe your experience owning a plugin or skills infrastructure.', a: "Wrote the skill authoring standard and shared plugin library for OpenClaw. Designed the session and permission model that lets contributors ship new capabilities without breaking what already runs. Three agents in production, real clients depending on uptime. The authoring standard is what makes it scale: contributors don't need to understand the full platform to add capabilities safely." },
+      { q: 'How do you advocate for developer experience when you don\'t own the tools?', a: "At Relativity: pushed for tooling changes with evidence from incident data. When you can show that a friction point causes a specific failure mode at a measurable rate, the conversation changes from opinion to data. I built internal automation that made compliance requirements easier to meet, reducing friction without reducing rigor." },
+      { q: 'What does entrepreneurial look like for you, given this team runs like a startup?', a: "At Cadence AI Labs I own discovery, roadmap, implementation, GTM, and support with no safety net. At OpenClaw I wrote the authoring standard, defined the success metrics, and ship capabilities without a committee. I'm used to creating the process, not inheriting it." }
+    ],
+    talkingPoints: [
+      'Wrote the skill authoring standard and plugin library for OpenClaw',
+      'Designed the session/permission model for multi-agent production platform',
+      'Relativity: cross-team integration, DX advocacy with evidence-based approach',
+      'Warm referral from team member: lean into this relationship in the interview',
+      'Claude Code, GitHub Actions, MCP all in daily use'
+    ]
+  },
+  {
+    id: 'yahoo-sr-pm',
+    company: 'Yahoo',
+    color: '#6B21A8',
+    title: 'Sr. Product Manager, Platforms',
+    dateApplied: '2026-08-17',
+    status: 'applied',
+    pay: '$120,750 – $251,250',
+    location: 'United States',
+    link: 'https://ouryahoo.wd5.myworkdayjobs.com/careers/job/United-States-of-America/Sr-Product-Manager--Platforms_JR0026959',
+    referral: 'Friend on the team',
+    resume: 'yahoo-sr-pm-platforms.md',
+    note: 'Honest gap: no PM title in work history, no K8s / AWS / GCP depth. Lean into the AI-first angle and startup mindset. Referral carries meaningful weight here.',
+    description: 'Lead product strategy for Yahoo\'s internal developer platform: Cloud Runtime, Security, and Messaging. Define an AI-first product roadmap, replace manual workflows with AI-assisted automation, and reduce cognitive load for Yahoo\'s engineering organization.',
+    themes: ['AI-first product roadmap', 'Developer experience', 'Platform strategy', 'Stakeholder alignment', 'Startup / entrepreneurial mindset'],
+    questions: [
+      { q: 'You don\'t have a PM title in your background. Why should we consider you for a senior role?', a: "At Cadence, I own the full product lifecycle for every engagement: discovery, roadmap, MVP scoping, success metrics, GTM, and iteration from usage data. At OpenClaw, I wrote the authoring standard, defined what success looks like, and run the platform as a product, not just as infrastructure. I've been doing the work. The title is the part I'm asking for." },
+      { q: 'How would you define an AI-first product roadmap for an internal developer platform?', a: "Start with where manual processes exist: documentation generation, feedback synthesis, incident post-mortems, code review assistance. Map each to a measurable cognitive load reduction. Then sequence by: highest impact, lowest disruption, fastest feedback loop. The roadmap isn't 'add AI to everything.' It's 'replace specific manual steps with AI-assisted workflows, starting with the ones engineers hate most.'" },
+      { q: 'How do you reduce cognitive load for engineers without introducing new complexity?', a: "The tool has to work better than the current process, not just differently. At OpenClaw: reusable skills mean engineers invoke a capability without understanding its internals. The authoring standard means contributors can add capabilities without breaking production. Cognitive load reduction means the engineer does less, not learns a new system." },
+      { q: 'This team runs like a startup. What does that mean to you operationally?', a: "You create the process, you don't inherit it. At Cadence: every engagement requires me to define the roadmap, the success criteria, the delivery timeline, and the GTM approach from scratch. No committee, no approval chain. You move fast, you measure, you iterate. That's how I've operated for the past year." }
+    ],
+    talkingPoints: [
+      'Cadence: full PM lifecycle, paying clients, roadmaps, success metrics, GTM',
+      'OpenClaw: internal developer platform, authoring standards, DX ownership',
+      'AI tools: Claude Code, GitHub Copilot, Gemini in daily product workflows',
+      'Warm referral from team member: critical for a senior role without PM title',
+      'Honest gap: no K8s or public cloud depth — lead with AI-first angle and startup mindset'
+    ]
+  }
+];
+
+// --- Auth ---
+function auth() {
+  const val = document.getElementById('pw').value;
+  if (val === PASSWORD) {
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    localStorage.setItem('jt_auth', '1');
+    init();
+  } else {
+    document.getElementById('gate-err').style.display = 'block';
+  }
+}
+
+if (localStorage.getItem('jt_auth') === '1') {
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  document.addEventListener('DOMContentLoaded', () => {});
+}
+
+// --- State ---
+let activeFilter = 'all';
+
+function getStatus(job) {
+  return localStorage.getItem('jt_status_' + job.id) || job.status;
+}
+
+function setStatus(jobId, status) {
+  localStorage.setItem('jt_status_' + jobId, status);
+  renderStats();
+}
+
+function getNotes(jobId) {
+  return localStorage.getItem('jt_notes_' + jobId) || '';
+}
+
+function saveNotes(jobId) {
+  const val = document.getElementById('notes_' + jobId).value;
+  localStorage.setItem('jt_notes_' + jobId, val);
+  const msg = document.getElementById('notes_saved_' + jobId);
+  msg.style.display = 'inline';
+  setTimeout(() => msg.style.display = 'none', 2000);
+}
+
+// --- Filter ---
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderJobs();
+}
+
+// --- Stats ---
+function renderStats() {
+  const counts = { applied: 0, screening: 0, interview: 0, offer: 0, rejected: 0 };
+  JOBS.forEach(j => {
+    const s = getStatus(j);
+    if (counts[s] !== undefined) counts[s]++;
+  });
+  document.getElementById('nav-stats').innerHTML = `
+    <div class="nav-stat"><span class="num">${JOBS.length}</span><span class="lbl">Applied</span></div>
+    <div class="nav-stat"><span class="num">${counts.screening}</span><span class="lbl">Screening</span></div>
+    <div class="nav-stat"><span class="num">${counts.interview}</span><span class="lbl">Interview</span></div>
+    <div class="nav-stat"><span class="num">${counts.offer}</span><span class="lbl">Offer</span></div>
+  `;
+}
+
+// --- Render Jobs ---
+function renderJobs() {
+  const list = document.getElementById('jobs-list');
+  const visible = activeFilter === 'all'
+    ? JOBS
+    : JOBS.filter(j => getStatus(j) === activeFilter);
+
+  if (visible.length === 0) {
+    list.innerHTML = '<p style="color:#999;padding:20px 0;">No applications in this category.</p>';
+    return;
+  }
+
+  list.innerHTML = visible.map(job => {
+    const status = getStatus(job);
+    const statusLabel = { applied: 'Applied', screening: 'Phone Screen', interview: 'Interview', offer: 'Offer', rejected: 'Rejected', withdrawn: 'Withdrawn' }[status] || status;
+    const statusClass = 's-' + status;
+    const initial = job.company[0];
+    const date = new Date(job.dateApplied).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+    const questionsHtml = job.questions.map((qa, i) => `
+      <div class="qa-item" id="qa_${job.id}_${i}">
+        <div class="qa-q" onclick="toggleQA('${job.id}', ${i})">
+          <span>${qa.q}</span>
+          <span class="qa-hint" id="qa_hint_${job.id}_${i}">Reveal answer</span>
+        </div>
+        <div class="qa-a">${qa.a}</div>
+      </div>
+    `).join('');
+
+    const tpHtml = job.talkingPoints.map(tp => `
+      <li><span class="tp-dot"></span><span>${tp}</span></li>
+    `).join('');
+
+    const statusOptions = ['applied','screening','interview','offer','rejected','withdrawn']
+      .map(s => `<option value="${s}" ${s === status ? 'selected' : ''}>${{ applied:'Applied', screening:'Phone Screen', interview:'Interview', offer:'Offer', rejected:'Rejected', withdrawn:'Withdrawn' }[s]}</option>`)
+      .join('');
+
+    return `
+      <div class="job-card" id="card_${job.id}">
+        <div class="job-header" onclick="toggleCard('${job.id}')">
+          <div class="co-badge" style="background:${job.color}">${initial}</div>
+          <div class="job-info">
+            <div class="job-co">${job.company}</div>
+            <div class="job-title">${job.title}</div>
+            <div class="job-sub">
+              <span>${date}</span>
+              ${job.pay !== 'Not disclosed' ? `<span class="job-pay">${job.pay}</span>` : '<span style="color:#AAA">Pay not disclosed</span>'}
+              ${job.referral ? `<span class="referral-tag">Referral</span>` : ''}
+            </div>
+          </div>
+          <div class="job-right">
+            <span class="status-badge ${statusClass}" id="badge_${job.id}">${statusLabel}</span>
+            <span class="chevron">&#8964;</span>
+          </div>
+        </div>
+        <div class="job-body" id="body_${job.id}">
+          <div class="tab-nav">
+            <button class="tab-btn active" onclick="showTab('${job.id}','overview',this)">Overview</button>
+            <button class="tab-btn" onclick="showTab('${job.id}','prep',this)">Interview Prep</button>
+            <button class="tab-btn" onclick="showTab('${job.id}','notes',this)">Notes</button>
+          </div>
+          <div class="tab-content">
+            <!-- Overview -->
+            <div class="tab-pane active" id="tab_${job.id}_overview">
+              ${job.note ? `<div class="note-banner">Note: ${job.note}</div>` : ''}
+              <div class="overview-grid">
+                <div class="info-block">
+                  <h4>Description</h4>
+                  <p>${job.description}</p>
+                </div>
+                <div class="info-block">
+                  <h4>Key Themes</h4>
+                  <div>${job.themes.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+                  ${job.referral ? `<p style="margin-top:12px;font-size:13px;color:#8A6400;background:#FFF3CD;padding:8px 12px;border-radius:6px;"><strong>Referral:</strong> ${job.referral}</p>` : ''}
+                  ${job.location ? `<p style="margin-top:10px;font-size:13px;color:#666;"><strong>Location:</strong> ${job.location}</p>` : ''}
+                  ${job.link ? `<p style="margin-top:6px;font-size:13px;"><a href="${job.link}" target="_blank" style="color:#2E6FB8;">View posting</a></p>` : ''}
+                </div>
+              </div>
+              <div class="status-editor">
+                <label>Update Status</label>
+                <select onchange="updateStatus('${job.id}', this.value)">${statusOptions}</select>
+              </div>
+            </div>
+            <!-- Prep -->
+            <div class="tab-pane" id="tab_${job.id}_prep">
+              <div class="prep-block">
+                <h3>Interview Questions</h3>
+                <p style="font-size:13px;color:#888;margin-bottom:14px;">Click any question to reveal a suggested answer framework.</p>
+                ${questionsHtml}
+              </div>
+              <div class="prep-block">
+                <h3>Talking Points</h3>
+                <ul class="tp-list">${tpHtml}</ul>
+              </div>
+            </div>
+            <!-- Notes -->
+            <div class="tab-pane" id="tab_${job.id}_notes">
+              <label class="notes-label">Private notes for this application</label>
+              <textarea class="notes-ta" id="notes_${job.id}" placeholder="Recruiter name, next steps, things to remember...">${getNotes(job.id)}</textarea>
+              <div class="notes-actions">
+                <button class="notes-save" onclick="saveNotes('${job.id}')">Save Notes</button>
+                <span class="notes-saved" id="notes_saved_${job.id}">Saved.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleCard(id) {
+  document.getElementById('card_' + id).classList.toggle('open');
+}
+
+function showTab(jobId, tab, btn) {
+  document.querySelectorAll(`#tab_${jobId}_overview, #tab_${jobId}_prep, #tab_${jobId}_notes`)
+    .forEach(el => el.classList.remove('active'));
+  document.getElementById(`tab_${jobId}_${tab}`).classList.add('active');
+  btn.closest('.tab-nav').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function toggleQA(jobId, i) {
+  const item = document.getElementById(`qa_${jobId}_${i}`);
+  const hint = document.getElementById(`qa_hint_${jobId}_${i}`);
+  item.classList.toggle('open');
+  hint.textContent = item.classList.contains('open') ? 'Hide' : 'Reveal answer';
+}
+
+function updateStatus(jobId, status) {
+  setStatus(jobId, status);
+  const labels = { applied:'Applied', screening:'Phone Screen', interview:'Interview', offer:'Offer', rejected:'Rejected', withdrawn:'Withdrawn' };
+  const classes = ['s-applied','s-screening','s-interview','s-offer','s-rejected','s-withdrawn'];
+  const badge = document.getElementById('badge_' + jobId);
+  badge.textContent = labels[status];
+  badge.className = 'status-badge s-' + status;
+}
+
+function init() {
+  renderStats();
+  renderJobs();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem('jt_auth') === '1') init();
+});
+</script>
+</body>
+</html>
