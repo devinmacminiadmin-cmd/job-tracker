@@ -560,6 +560,36 @@ const JOBS = [
     ]
   },
   {
+    id: 'google-pm-ai-search',
+    company: 'Google',
+    color: '#4285F4',
+    title: 'Product Manager I, AI Search Inputs',
+    dateApplied: '2026-08-17',
+    status: 'applied',
+    pay: '$138,000 – $197,000 + 15% bonus + equity',
+    location: 'San Francisco / Mountain View, CA',
+    link: 'https://www.google.com/about/careers/applications/jobs/results/138829313796383430',
+    referral: null,
+    resume: 'google-pm-ai-search-inputs.md',
+    note: null,
+    description: 'Product Manager on the AI Search Inputs team, working directly with the latest Gemini models to redefine how billions of people interact with information. Build autocomplete experiences, rich data input UIs, and features that teach users what AI Search can do.',
+    themes: ['Gemini models', 'User behavior design', 'AI capability discovery', 'Eval frameworks', 'Cross-functional delivery'],
+    questions: [
+      { q: 'Why Google Search specifically?', a: "Search is where AI meets billions of people who didn't opt in to a technical product. Every other role I'm pursuing is enterprise or developer-facing. Search Inputs is the inverse: how do you make a frontier AI model feel like something your grandmother can use without a manual? That's the hardest version of the problem I care about." },
+      { q: 'Describe a 0-to-1 product you shipped.', a: "FairSwap: two-sided restaurant reservation marketplace from concept to App Store and Google Play. Owned product requirements, UX flows, engineering, and launch. Also every Cadence AI Labs engagement: discovery call, MVP scoping with success criteria, build, ship, measure. Each one is 0-to-1 in 2 to 4 weeks." },
+      { q: 'How do you teach users to discover new AI capabilities?', a: "At OpenClaw I built a skill and plugin architecture whose core design question was exactly this: how does a user know what to ask? The answer was contextual surfacing: capabilities appear when they're relevant, not in a help menu. Applied to Search Inputs, I'd look at where users abandon queries, where they rephrase, and where they don't try at all. Those are the teaching moments." },
+      { q: 'What is your experience with LLM evaluation frameworks?', a: "Built a production eval pipeline for a financial signal system: defined failure modes, built filters that reject bad model outputs, locked an 80/80 baseline (80% winner capture, 80% loser filter). Every behavioral change tested against that baseline before shipping. The discipline is the same for Search: define what good looks like before you ship, and measure against it continuously." },
+      { q: 'How do you balance data analysis with UX design?', a: "Data tells you where users are struggling; design tells you why. At Cadence, I measure time-to-success and task completion on deployed agents. When a metric is off, I go back to the user interaction logs and watch what actually happened. The numbers narrow where to look; the UX work figures out what to change." }
+    ],
+    talkingPoints: [
+      'OpenClaw AI UX: built capability discovery system for non-technical users, same core problem as Search Inputs',
+      'Cadence AI Labs: full 0-to-1 PM lifecycle, discovery through launch, paying clients',
+      'Eval framework: baseline locking, 80/80 rule, measured iteration from outcomes',
+      'FairSwap: shipped consumer product end-to-end to App Store and Google Play',
+      'Hands-on Gemini experience via LiteLLM proxy in production'
+    ]
+  },
+  {
     id: 'yahoo-sr-pm',
     company: 'Yahoo',
     color: '#6B21A8',
@@ -596,7 +626,8 @@ const LEADS = [
     title:'Forward Deployed Engineer, Applied AI',
     pay:'~$350,000 – $550,000 TC', location:'San Francisco / NYC / Seattle',
     wfh:'hybrid', link:'https://job-boards.greenhouse.io/anthropic/jobs/4985877008',
-    fit:'Live posting — same FDE motion as the Custom Agents role you applied for 8/15. This variant embeds with Applied AI customers. Founding team member opportunity.' },
+    closed: true,
+    fit:'Posting confirmed closed as of 2026-08-17. Same FDE motion as the Custom Agents role applied 8/15.' },
   { id:'anthropic-technical-deployment-lead', cat:'fde', company:'Anthropic', color:'#D4521A',
     title:'Technical Deployment Lead',
     pay:'~$250,000 – $400,000 TC (est.)', location:'San Francisco / NYC / Seattle',
@@ -611,7 +642,8 @@ const LEADS = [
     title:'Founding Forward Deployed Engineer',
     pay:'~$170,000 – $280,000 + equity', location:'Palo Alto, CA',
     wfh:'hybrid', link:'https://job-boards.greenhouse.io/gleanwork/jobs/4651991005',
-    fit:'The Glean AI Solutions Engineer posting that disappeared was similar to this. Founding-team FDE building next-gen product surfaces directly with enterprise C-suite.' },
+    closed: true,
+    fit:'Posting no longer active as of 2026-08-17.' },
   { id:'databricks-fde', cat:'fde', company:'Databricks', color:'#FF6B35',
     title:'AI Engineer — Forward Deployed',
     pay:'~$175,000 – $280,000 + equity (est.)', location:'Remote (US)',
@@ -913,8 +945,9 @@ function renderLeads() {
           <div class="lead-pay">${l.pay}</div>
           <div class="lead-location">📍 ${l.location}</div>
           <div class="lead-fit">${l.fit}</div>
+          ${l.closed ? '<div style="background:#FEE2E2;color:#991B1B;font-size:12px;font-weight:700;padding:6px 12px;border-radius:6px;margin-bottom:10px;">Posting closed</div>' : ''}
           <div class="lead-actions">
-            <a href="${l.link}" target="_blank" class="lead-apply-btn">View &amp; Apply</a>
+            <a href="${l.link}" target="_blank" class="lead-apply-btn" ${l.closed ? 'style="background:#AAA;pointer-events:none;"' : ''}>View &amp; Apply</a>
             <select class="lead-status-sel ls-${status}" onchange="updateLeadStatus('${l.id}', this.value, this)">${statusOpts}</select>
           </div>
         </div>
