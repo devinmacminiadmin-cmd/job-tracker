@@ -375,6 +375,18 @@
     </div>
 
     <div class="prep-card">
+      <h3>Work-Style / Situational Judgment Assessments (General)</h3>
+      <p style="font-size:12px;color:#888;font-style:italic;margin-bottom:10px;">Applies to any company using this format, not just Google. Based on public candidate reports and general SJT guidance, not any specific vendor's confidential content.</p>
+      <ul>
+        <li><strong>What they are:</strong> Non-technical screens (Likert-scale statements or scenario + "pick most/least likely action" items) used to profile collaboration style, conscientiousness, and judgment under ambiguity before a recruiter ever talks to you. Google's version is the GHA; other companies run their own versions of the same idea (often built on SHL, Criteria Corp, or similar platforms).</li>
+        <li><strong>Read the whole scenario first.</strong> Don't answer off the first sentence. Most SJT scenarios bury the actual constraint (a deadline, a stakeholder conflict, a policy line) two or three sentences in.</li>
+        <li><strong>Align answers to the role, not to abstract virtue.</strong> When every option sounds reasonable, ask which one a strong performer in *this specific role* would actually do first. For PM roles that's usually: clarify/align stakeholders before unilateral action, escalate genuine blockers rather than sit on them, and default to data over gut feel when both are available.</li>
+        <li><strong>Consistency beats optimization.</strong> These tools cross-check your answers against each other. Answer the same underlying personality honestly across all items rather than trying to game each one individually — the aggregate contradiction is what gets flagged, not any single "imperfect" answer.</li>
+        <li><strong>No prize for speed.</strong> Most of these have generous or no time limits. Slow down on scenario-based items specifically; rushed reading is the most common self-inflicted mistake candidates report.</li>
+      </ul>
+    </div>
+
+    <div class="prep-card">
       <h3>Talking Points Cheat Sheet</h3>
       <ul>
         <li><strong>Entrepreneurial:</strong> Founded Cadence AI Labs. Own discovery, scoping, building, GTM, and support. Every engagement is a startup sprint with no safety net.</li>
@@ -600,9 +612,32 @@ const JOBS = [
     link: 'https://www.google.com/about/careers/applications/dashboard',
     referral: null,
     resume: 'google-pm-ai-search-inputs.md',
-    note: 'Online assessment stage — invited 2026-08-19. Deadline: 7:24 AM ET / 4:24 AM PT on August 23. Complete via Candidate Portal. Second assessment may be required per portal details. Results determine eligibility for Recruiting Team review, not a guaranteed interview.',
+    note: 'Online assessment stage — invited 2026-08-19. First assessment confirmed: Google Hiring Assessment (GHA), ~30 min, measures general work-style skills (not role-specific). Portal shows deadline as August 23, 6:24 AM — verify timezone before starting (earlier estimate was 7:24 AM ET / 4:24 AM PT; portal figure takes priority). Complete via Candidate Portal. Second assessment may be required per portal details. Results determine eligibility for Recruiting Team review, not a guaranteed interview.',
     description: 'Product Manager on the AI Search Inputs team, working directly with the latest Gemini models to redefine how billions of people interact with information. Build autocomplete experiences, rich data input UIs, and features that teach users what AI Search can do.',
     themes: ['Gemini models', 'User behavior design', 'AI capability discovery', 'Eval frameworks', 'Cross-functional delivery'],
+    assessmentPrep: {
+      disclaimer: 'General prep only, built from public candidate reports (Reddit, 1Point3Acres, Blind, Medium, aggregator guides current through mid-2026). Not question-specific — nothing here references or guesses actual assessment content, which stays confidential per Google\'s terms.',
+      whatItIs: [
+        'The Google Hiring Assessment (GHA) is a non-technical, non-coding work-style/behavioral screen. It is not scored right/wrong like an aptitude test — it profiles how you say you work, decide, and collaborate, and gets used as an early filter before recruiter/hiring-team review.',
+        'Format (candidate-reported, varies by cycle): roughly 50–105 items, ~30–60 minutes, usually no hard countdown timer, can be done in multiple sittings. Two common item types: (1) single scenario/statement rated on a 5-point Likert-style scale, and (2) forced-choice sets — a workplace scenario with several actions where you pick the one \'Most Like Me\' and the one \'Least Like Me.\'',
+        'What it\'s reading for: collaboration style, communication under ambiguity, conscientiousness/reliability, handling policy or ethics tension, and \'Googleyness\' traits like intellectual humility and comfort with incomplete information. This is the same DNA as Google\'s in-person Googleyness & Leadership interview round, just earlier and self-reported.'
+      ],
+      strategy: [
+        'On forced-choice items, don\'t hunt for a \'trick\' answer — most options are plausible/positive. Candidates report the trap is overthinking single statements in isolation. Read for the role\'s dominant need (PM = cross-functional delivery, structured judgment, calm under ambiguity) and let that break ties.',
+        'Stay consistent across the whole assessment. It\'s designed to catch contradictions — if you say you\'re highly collaborative in one item, don\'t answer as a lone-wolf decider three items later. Consistency reads as authenticity to these instruments; flip-flopping reads as gaming it.',
+        'Answer as the PM you actually are on your best day, not who you think Google wants. These instruments are built to catch \'faking good\' patterns (uniformly picking the most virtuous-sounding option every time is itself a flag).',
+        'Sit somewhere quiet and don\'t rush. Reports note no hard countdown timer and multi-sitting support, so there\'s no upside to speed here — the payoff is a calmer, more internally consistent set of answers.'
+      ],
+      afterGha: [
+        'A pass moves you into the standard Google PM loop. Reports describe a recruiter phone screen (product sense/estimation basics, \'why this move\' story) followed by a virtual onsite of roughly 5–7 rounds, heavier on behavioral/Googleyness and practical case questions than on software-engineering-style technical depth.',
+        'Search specifically gets pressure-tested harder on consumer intuition than enterprise-facing PM roles — interviewers reportedly probe search fundamentals, the ads/ecosystem business model, and whether you can strategize credibly with engineers and PMs already embedded in that world, without expecting you to code.',
+        'Case types reported for Search/PM roles: launching a new Search feature globally, positioning a feature against a competitor, growing adoption in a specific market. Practice structuring these as clear frameworks rather than freestyling — aim for concise answers (candidates mention ~90 seconds per case point, then pause for interviewer steering).',
+        'For the recruiter screen specifically: have a tight, rehearsed answer for \'why leave enterprise/Cadence-style work for a massive consumer product, and why Google Search.\' This is reported as a near-universal early question for candidates moving from B2B/enterprise backgrounds into consumer Search roles.',
+        'Since this is an AI Search Inputs role, expect the case and metrics questions to lean into AI/data-driven product decisions: A/B test fundamentals (primary vs. guardrail metrics, randomization unit, power/sample size, common pitfalls), plus explaining basic ML/model behavior in product terms rather than engineering terms.',
+        'Develop specific, defensible opinions on Google Search\'s current AI features, roadmap direction, and competitive threats (OpenAI, Perplexity, etc.) before the loop — reported as a recurring theme across Search PM interviews, not just a nice-to-have.',
+        'Preparation reality check from candidates: this isn\'t a 1-2 week cram. Multiple reports recommend getting case-interview coaching or a structured framework *before* drilling practice reps, specifically to avoid building bad habits that are harder to unlearn later. Even strong prep doesn\'t guarantee an outcome — hiring-manager priorities and timing matter too, so treat the process as a skill-building exercise regardless of result.'
+      ]
+    },
     questions: [
       { q: 'Why Google Search specifically?', a: "Search is where AI meets billions of people who didn't opt in to a technical product. Every other role I'm pursuing is enterprise or developer-facing. Search Inputs is the inverse: how do you make a frontier AI model feel like something your grandmother can use without a manual? That's the hardest version of the problem I care about." },
       { q: 'Describe a 0-to-1 product you shipped.', a: "FairSwap: two-sided restaurant reservation marketplace from concept to App Store and Google Play. Owned product requirements, UX flows, engineering, and launch. Also every Cadence AI Labs engagement: discovery call, MVP scoping with success criteria, build, ship, measure. Each one is 0-to-1 in 2 to 4 weeks." },
@@ -797,7 +832,7 @@ function renderJobs() {
 
   list.innerHTML = visible.map(job => {
     const status = getStatus(job);
-    const statusLabel = { applied: 'Applied', screening: 'Phone Screen', interview: 'Interview', offer: 'Offer', rejected: 'Rejected', withdrawn: 'Withdrawn' }[status] || status;
+    const statusLabel = { applied: 'Applied', screening: 'Screening', interview: 'Interview', offer: 'Offer', rejected: 'Rejected', withdrawn: 'Withdrawn' }[status] || status;
     const statusClass = 's-' + status;
     const initial = job.company[0];
     const date = new Date(job.dateApplied).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -817,7 +852,7 @@ function renderJobs() {
     `).join('');
 
     const statusOptions = ['applied','screening','interview','offer','rejected','withdrawn']
-      .map(s => `<option value="${s}" ${s === status ? 'selected' : ''}>${{ applied:'Applied', screening:'Phone Screen', interview:'Interview', offer:'Offer', rejected:'Rejected', withdrawn:'Withdrawn' }[s]}</option>`)
+      .map(s => `<option value="${s}" ${s === status ? 'selected' : ''}>${{ applied:'Applied', screening:'Screening', interview:'Interview', offer:'Offer', rejected:'Rejected', withdrawn:'Withdrawn' }[s]}</option>`)
       .join('');
 
     return `
@@ -868,6 +903,16 @@ function renderJobs() {
             </div>
             <!-- Prep -->
             <div class="tab-pane" id="tab_${job.id}_prep">
+              ${job.assessmentPrep ? `
+              <div class="prep-block" style="background:#F8F9FC;border:1px solid #E1E5EE;border-radius:8px;padding:14px 16px;margin-bottom:16px;">
+                <h3 style="margin-top:0;">Online Assessment Prep</h3>
+                <p style="font-size:12px;color:#888;font-style:italic;margin-bottom:12px;">${job.assessmentPrep.disclaimer}</p>
+                <h4 style="font-size:13px;margin-bottom:6px;">What it is</h4>
+                <ul style="margin-bottom:12px;">${job.assessmentPrep.whatItIs.map(i => `<li style="margin-bottom:6px;font-size:13px;">${i}</li>`).join('')}</ul>
+                <h4 style="font-size:13px;margin-bottom:6px;">Strategy</h4>
+                <ul style="margin-bottom:12px;">${job.assessmentPrep.strategy.map(i => `<li style="margin-bottom:6px;font-size:13px;">${i}</li>`).join('')}</ul>
+                ${job.assessmentPrep.afterGha ? `<h4 style="font-size:13px;margin-bottom:6px;">What comes after</h4><ul>${job.assessmentPrep.afterGha.map(i => `<li style="margin-bottom:6px;font-size:13px;">${i}</li>`).join('')}</ul>` : ''}
+              </div>` : ''}
               <div class="prep-block">
                 <h3>Interview Questions</h3>
                 <p style="font-size:13px;color:#888;margin-bottom:14px;">Click any question to reveal a suggested answer framework.</p>
@@ -915,7 +960,7 @@ function toggleQA(jobId, i) {
 
 function updateStatus(jobId, status) {
   setStatus(jobId, status);
-  const labels = { applied:'Applied', screening:'Phone Screen', interview:'Interview', offer:'Offer', rejected:'Rejected', withdrawn:'Withdrawn' };
+  const labels = { applied:'Applied', screening:'Screening', interview:'Interview', offer:'Offer', rejected:'Rejected', withdrawn:'Withdrawn' };
   const classes = ['s-applied','s-screening','s-interview','s-offer','s-rejected','s-withdrawn'];
   const badge = document.getElementById('badge_' + jobId);
   badge.textContent = labels[status];
