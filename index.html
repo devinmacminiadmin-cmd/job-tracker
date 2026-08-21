@@ -636,7 +636,20 @@ const JOBS = [
         'Since this is an AI Search Inputs role, expect the case and metrics questions to lean into AI/data-driven product decisions: A/B test fundamentals (primary vs. guardrail metrics, randomization unit, power/sample size, common pitfalls), plus explaining basic ML/model behavior in product terms rather than engineering terms.',
         'Develop specific, defensible opinions on Google Search\'s current AI features, roadmap direction, and competitive threats (OpenAI, Perplexity, etc.) before the loop — reported as a recurring theme across Search PM interviews, not just a nice-to-have.',
         'Preparation reality check from candidates: this isn\'t a 1-2 week cram. Multiple reports recommend getting case-interview coaching or a structured framework *before* drilling practice reps, specifically to avoid building bad habits that are harder to unlearn later. Even strong prep doesn\'t guarantee an outcome — hiring-manager priorities and timing matter too, so treat the process as a skill-building exercise regardless of result.'
-      ]
+      ],
+      loopReport: {
+        source: 'Candidate self-report shared 2026-08-20 (r/ProductManagement-style post) from a CS grad who did 2 years SWE + 3 years B2B SaaS PM before landing an offer. Anecdotal, one data point, but directionally useful and consistent with other public reports above.',
+        items: [
+          'Full onsite loop reported as four back-to-back 45-min rounds: Product Sense, Technical, Leadership/Behavioral, and Googleyness — followed by hiring committee review (this candidate: ~1 week for recruiter feedback, then ~2 more weeks for HC).',
+          'Phone screen was a product design prompt ("design a product for elderly users"). Candidate spent ~15 of the ~45 min purely on clarifying the goal (what are we optimizing for: safety, independence, social connection?) and defining user segments (age bands, tech-savviness, living alone vs. with family) before touching solutions. Framed as the single highest-leverage habit: never jump to solutions.',
+          'Technical round for this candidate was systems-design flavored ("design the backend for a real-time collaborative document editor") and leaned on their SWE background. Their advice for non-engineers: you don\'t need to design the system, just speak fluently about databases, APIs, caching, latency, and scalability concepts at a high level. Worth a quick refresher pass on those five terms before the loop given the Cadence/OpenClaw technical background here is a real edge, not a gap to hide.',
+          'Leadership/behavioral prompts reported: "tell me about a time you had to influence without authority," "describe a decision made with incomplete information," "tell me about a conflict with an engineer and how you resolved it." Candidate prepped 8–10 STAR stories (~90 seconds each) spanning leadership, conflict, failure, success, and ambiguity themes, then drew from that bank live rather than improvising.',
+          'Googleyness round described as harder to pin down than the others — a mix of behavioral questions plus softer probing on curiosity, "thinking big," and intellectual humility about what you don\'t know. No clean framework reported; candidate\'s approach was just to answer honestly rather than perform a persona.',
+          'Two of the candidate\'s four onsite rounds directly referenced specific Google products. Their standing prep habit: use Search, Maps, Photos, Gmail daily during the prep window and keep a running note of friction points and "if I owned this, I\'d change X" opinions — this doubles as prep for both the Product Sense round and general Search opinions called out above. Given this role is AI Search Inputs specifically, this daily-use habit should extend to noticing every AI-powered input/autocomplete moment in Search, not just the base product.',
+          'Volume context: this candidate applied to ~60 companies and heard back from only ~8 — reinforces that a single "screening" status here (already past that bar) is already a meaningfully good outcome regardless of final result.',
+          'Prep investment reported: ~6 weeks total, ~30 mock interviews sourced from Blind/Reddit/Facebook PM communities plus a paid Product Alliance Google-specific course. Directionally supports pursuing a few mock product-sense/case reps with a peer or on Pramp/similar before the onsite, not just solo framework review.'
+        ]
+      }
     },
     questions: [
       { q: 'Why Google Search specifically?', a: "Search is where AI meets billions of people who didn't opt in to a technical product. Every other role I'm pursuing is enterprise or developer-facing. Search Inputs is the inverse: how do you make a frontier AI model feel like something your grandmother can use without a manual? That's the hardest version of the problem I care about." },
@@ -912,6 +925,7 @@ function renderJobs() {
                 <h4 style="font-size:13px;margin-bottom:6px;">Strategy</h4>
                 <ul style="margin-bottom:12px;">${job.assessmentPrep.strategy.map(i => `<li style="margin-bottom:6px;font-size:13px;">${i}</li>`).join('')}</ul>
                 ${job.assessmentPrep.afterGha ? `<h4 style="font-size:13px;margin-bottom:6px;">What comes after</h4><ul>${job.assessmentPrep.afterGha.map(i => `<li style="margin-bottom:6px;font-size:13px;">${i}</li>`).join('')}</ul>` : ''}
+                ${job.assessmentPrep.loopReport ? `<h4 style="font-size:13px;margin-bottom:6px;">Candidate loop report (anecdotal)</h4><p style="font-size:11px;color:#888;font-style:italic;margin-bottom:8px;">${job.assessmentPrep.loopReport.source}</p><ul>${job.assessmentPrep.loopReport.items.map(i => `<li style="margin-bottom:6px;font-size:13px;">${i}</li>`).join('')}</ul>` : ''}
               </div>` : ''}
               <div class="prep-block">
                 <h3>Interview Questions</h3>
