@@ -231,6 +231,16 @@
     .prep-card li { margin-bottom: 6px; }
 
     /* ---- Lead Cards ---- */
+    .top-tab-bar { display: flex; gap: 4px; padding: 0 40px; background: #0F1B2D; }
+    .top-tab-btn {
+      padding: 14px 24px; border: none; background: transparent; color: #7A9DBB;
+      font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
+      border-bottom: 3px solid transparent;
+    }
+    .top-tab-btn:hover { color: #fff; }
+    .top-tab-btn.active { color: #fff; border-bottom-color: #2E6FB8; }
+    @media (max-width: 680px) { .top-tab-bar { padding: 0 14px; overflow-x: auto; } .top-tab-btn { padding: 12px 16px; font-size: 13px; white-space: nowrap; } }
+
     .leads-section { margin-top: 52px; }
     .leads-cat-bar { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
     .leads-cat-btn {
@@ -321,7 +331,13 @@
     <div class="nav-stats" id="nav-stats"></div>
   </nav>
 
+  <div class="top-tab-bar">
+    <button class="top-tab-btn active" id="toptab-devin" onclick="showView('devin')">Devin's Job Search</button>
+    <button class="top-tab-btn" id="toptab-mom" onclick="showView('mom')">Linda's Job Search</button>
+  </div>
+
   <div class="main">
+  <div id="devin-view">
     <div class="filter-bar">
       <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
       <button class="filter-btn" onclick="setFilter('applied',this)">Applied</button>
@@ -343,12 +359,6 @@
         <button class="leads-cat-btn" onclick="setLeadCat('fellows',this)">Research / Fellows</button>
       </div>
       <div id="leads-list"></div>
-    </div>
-
-    <div class="leads-section" style="margin-top:60px;border-top:2px solid #E4E7EC;padding-top:40px;">
-      <div class="section-hd">Linda Anderson — Job Search (Separate Track)</div>
-      <p style="font-size:13px;color:#888;margin-bottom:20px;">Licensed insurance & customer service professional, 10+ yrs. Phone-based support, life/health/P&C/Medicare/benefits. Roles below match her background — not mixed with Devin's tracker above.</p>
-      <div id="mom-leads-list"></div>
     </div>
 
     <div class="section-hd">General Interview Prep</div>
@@ -402,6 +412,14 @@
         <li><strong>Claude specifically:</strong> Daily user. Claude Code, Claude API, LiteLLM routing to Claude Sonnet/Haiku. Observed model judgment in production across thousands of real interactions.</li>
       </ul>
     </div>
+  </div>
+  </div>
+
+  <div id="mom-view" style="display:none;">
+    <div class="section-hd">Linda Anderson — Job Search</div>
+    <p style="font-size:13px;color:#888;margin-bottom:20px;">Licensed insurance & benefits professional, 10+ yrs. Non-sales roles only — targeting positions above entry-level CSR wage floor where her license and experience carry real value.</p>
+    <div id="mom-leads-list"></div>
+  </div>
   </div>
 </div>
 
@@ -1114,6 +1132,13 @@ function init() {
   renderJobs();
   renderLeads();
   renderMomLeads();
+}
+
+function showView(view) {
+  document.getElementById('devin-view').style.display = view === 'devin' ? 'block' : 'none';
+  document.getElementById('mom-view').style.display = view === 'mom' ? 'block' : 'none';
+  document.getElementById('toptab-devin').classList.toggle('active', view === 'devin');
+  document.getElementById('toptab-mom').classList.toggle('active', view === 'mom');
 }
 
 window.addEventListener('DOMContentLoaded', () => {
