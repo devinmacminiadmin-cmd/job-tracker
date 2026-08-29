@@ -345,6 +345,12 @@
       <div id="leads-list"></div>
     </div>
 
+    <div class="leads-section" style="margin-top:60px;border-top:2px solid #E4E7EC;padding-top:40px;">
+      <div class="section-hd">Linda Anderson — Job Search (Separate Track)</div>
+      <p style="font-size:13px;color:#888;margin-bottom:20px;">Licensed insurance & customer service professional, 10+ yrs. Phone-based support, life/health/P&C/Medicare/benefits. Roles below match her background — not mixed with Devin's tracker above.</p>
+      <div id="mom-leads-list"></div>
+    </div>
+
     <div class="section-hd">General Interview Prep</div>
 
     <div class="prep-card">
@@ -763,6 +769,60 @@ const LEADS = [
     fit:'Production ML systems and distributed infrastructure background applies. Stretch on research depth, but the engineering and pipeline work is a credible entry.' }
 ];
 
+const MOM_LEADS = [
+  { id:'beaconhill-csr-medicare-supplement', company:'Beacon Hill (Staffing)', color:'#1B2A4A',
+    title:'Customer Service Representative — Medicare Supplement Claims',
+    pay:'Not disclosed', location:'Fully Remote (Chicago-area client)',
+    wfh:'remote', link:'https://bhsg.com/jobs/job/a1469318chi_1785939472-customer-service-representative-chicago-illinois/',
+    fit:'Fully remote, leverages customer service experience + health insurance benefits knowledge directly. Supports a Medicare Supplement claims team — close match to her BCBS-tailored resume angle.' },
+  { id:'allstate-medicare-benefit-advisor', company:'Allstate', color:'#0033A0',
+    title:'Licensed Medicare Benefit Advisor — Remote',
+    pay:'Not disclosed (base + commission typical for role)', location:'Remote (Illinois)',
+    wfh:'remote', link:'https://www.allstate.jobs/job/21593950/licensed-medicare-benefit-advisor-remote/',
+    fit:'Direct match: consults retired seniors on Medicare Life & Health plans. Requires active Life & Health license, which she holds. Builds on her Western & Southern and Kemper Medicare-adjacent experience.' },
+  { id:'chapter-medicare-benefits-advisor', company:'Chapter', color:'#2E6FB8',
+    title:'Consultative Sales Medicare Advisor — Remote',
+    pay:'$75,000 – $100,000/yr (OTE $80,000+)', location:'Remote (US)',
+    wfh:'remote', link:'https://work.fountain.com/jobs/Chapter-Consultative-sales-Medicare-Advisor|-Remote-|-OTE-80000-6U3YVb1fDNHhXaka',
+    fit:'Consultative, needs-based Medicare enrollment guidance — matches her “needs-based consultations” experience at Western & Southern and Kemper almost exactly. Strong pay ceiling for a remote role.' }
+];
+
+function renderMomLeads() {
+  const el = document.getElementById('mom-leads-list');
+  if (!el) return;
+  el.innerHTML = MOM_LEADS.map(l => {
+    const status = localStorage.getItem('jt_mom_lead_' + l.id) || 'new';
+    const statusOpts = ['new','saved','applied','skip'].map(s =>
+      `<option value="${s}" ${s===status?'selected':''}>${{new:'New',saved:'Saved',applied:'Applied',skip:'Skip'}[s]}</option>`
+    ).join('');
+    return `
+    <div class="lead-card">
+      <div class="lead-inner">
+        <div class="co-badge" style="background:${l.color}">${l.company[0]}</div>
+        <div class="lead-info">
+          <div class="lead-co">${l.company}</div>
+          <div class="lead-title">${l.title}</div>
+          <div class="lead-tags">
+            <span class="lead-tag tag-remote">Remote</span>
+          </div>
+          <div class="lead-pay">${l.pay}</div>
+          <div class="lead-location">📍 ${l.location}</div>
+          <div class="lead-fit">${l.fit}</div>
+          <div class="lead-actions">
+            <a href="${l.link}" target="_blank" class="lead-apply-btn">View &amp; Apply</a>
+            <select class="lead-status-sel ls-${status}" onchange="updateMomLeadStatus('${l.id}', this.value, this)">${statusOpts}</select>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateMomLeadStatus(id, val, el) {
+  localStorage.setItem('jt_mom_lead_' + id, val);
+  el.className = 'lead-status-sel ls-' + val;
+}
+
 // --- Auth ---
 function auth() {
   const val = document.getElementById('pw').value;
@@ -1048,6 +1108,7 @@ function init() {
   renderStats();
   renderJobs();
   renderLeads();
+  renderMomLeads();
 }
 
 window.addEventListener('DOMContentLoaded', () => {
